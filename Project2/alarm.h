@@ -3,7 +3,18 @@
 
 #include <stdbool.h>
 
+typedef struct _AlarmParameters {
+	int CurrentLEDToDisplay;
+	bool NeedToStartAlarm;
+	bool InMiddleOfAlarm;
+	long StartAlarmTimeStamp;
+	bool TurningLEDsFromLowToHigh;
+} AlarmParameters;
+
+AlarmParameters Alarm;
+
+void InitAlarm();
 bool CheckIfNeedToStartAlarm();
-void HandleAlarm(long CurrentTime, long StartAlarmTimeStamp, bool *InMiddleOfAlarm);
+void HandleAlarm(long CurrentTime);
 
 #endif

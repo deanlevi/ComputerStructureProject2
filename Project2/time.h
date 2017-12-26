@@ -13,8 +13,15 @@ typedef struct _TimeParameters {
 	int Seconds;
 	int Minutes;
 	int Hours;
-	
+
 } TimeParameters;
+
+typedef struct _StopperParameters {
+	int Seconds;
+	int Hundredths;
+	long TimeStamp;
+	bool Active;
+} StopperParameters;
 
 typedef enum _SetTimeEnum {
 	None,
@@ -24,7 +31,7 @@ typedef enum _SetTimeEnum {
 } SetTimeEnum;
 
 typedef enum _StateEnum {
-	None,
+	NoState,
 	Off,
 	On
 } StateEnum;
@@ -36,17 +43,9 @@ typedef struct _TimeSetParameters {
 	StateEnum CurrentState;
 	bool DisplayFirstTimeOnNone;
 	bool NeedToChangeDisplay;
-
 	long PushTimeStamp;
 	bool FirstUpdate;
 } TimeSetParameters;
-
-typedef struct _StopperParameters {
-	int Seconds;
-	int Hundredths;
-	long TimeStamp;
-	bool Active;
-} StopperParameters;
 
 TimeParameters ClockTime;
 TimeParameters AlarmTime;
@@ -54,11 +53,11 @@ TimeSetParameters ClockTimeSet;
 TimeSetParameters AlarmTimeSet;
 StopperParameters Stopper;
 
-void InitTime(TimeParameters Time);
+void InitTime();// was void InitTime(TimeParameters Time);
 void InitTimeSet(TimeSetParameters TimeSet);
 void InitStopper();
 void UpdateTime(long CurrentTime);
-void DisplayTime(long CurrentTime);
+void DisplayTime(long CurrentTime, bool *FirstTime);
 void HandleTimeSet(long CurrentTime, TimeParameters Time, TimeSetParameters TimeSet, bool IsAlarm);
 void HandleStopper(long CurrentTime);
 void DisplayStopper();
