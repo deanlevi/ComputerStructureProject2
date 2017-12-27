@@ -140,7 +140,9 @@ void DisplayTime(long CurrentTime, bool *FirstTime) {
 		*FirstTime = false;
 	}
 	else {
-		if (CurrentTime % 1000 <= 200 || CurrentTime % 1000 >= 800) {   // need to update seconds
+//		if (CurrentTime % 1000 <= 200 || CurrentTime % 1000 >= 800) {   // need to update seconds // todo dean - it can be exact
+		if (CurrentTime % 1000 == 0) {   // need to update seconds // todo dean - it can be exact
+
 			LCD_WriteStringAtPos(S2_buffer, 0, 11);
 			LCD_WriteStringAtPos(S1_buffer, 0, 10);
 		}
@@ -169,7 +171,7 @@ void CheckIfNeedToChangeDisplay(long CurrentTime, TimeSetParameters *TimeSet) {
 	/*if (BTN_GetValue(1) || BTN_GetValue(3)) {
 	TimeSet->NeedToChangeDisplay = true;
 	}*/ // todo
-	if ((CurrentTime - TimeSet->TimeSetTimeStamp) % (SECOND_IN_MS / 2) == 0 && TimeSet->BTNCNumOfPushs != None) { // todo verify that half second
+	if ((CurrentTime - TimeSet->TimeSetTimeStamp) % (SECOND_IN_MS / 2) == 0 && (TimeSet->BTNCNumOfPushs != None)) { // todo verify that half second
 		TimeSet->NeedToChangeDisplay = true;
 		if (TimeSet->CurrentState == On) {
 			TimeSet->CurrentState = Off;
@@ -238,7 +240,7 @@ void HandleLongPush(TimeParameters *Time, TimeSetParameters *TimeSet, bool Incre
 		UpdateClockByOne(Time, TimeSet, Increase);
 	}
 	if (CurrentTime - TimeSet->PushTimeStamp > TIME_SET_INITIAL_GAP &&
-		(CurrentTime - TimeSet->PushTimeStamp - TIME_SET_INITIAL_GAP) % TIME_SET_SPEED_GAP == 0) {
+		((CurrentTime - TimeSet->PushTimeStamp - TIME_SET_INITIAL_GAP) % TIME_SET_SPEED_GAP == 0)) {
 		UpdateClockByOne(Time, TimeSet, Increase);
 	}
 }
@@ -301,6 +303,6 @@ void DisplayStopper() {
 	S2 = Stopper.Seconds % 10;
 	Q1 = Stopper.Hundredths / 10;
 	Q2 = Stopper.Hundredths % 10;
-	total = Q2 + Q1 * 16 + S2 * 256 + S1 * 4096;
+	total = Q2 + Q1 * 16 + S2 * 256 + S1 * 4096; // todo dean - what is this?
 	SSD_WriteDigitsGrouped(total, 100);
 }
