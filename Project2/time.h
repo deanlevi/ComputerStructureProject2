@@ -2,12 +2,17 @@
 #define TIME_H
 
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#define MINUTE_IN_MS 60000
 #define SECOND_IN_MS 1000
+#define MINUTE_IN_MS (60 * SECOND_IN_MS)
+#define HOUR_IN_MS (60 * MINUTE_IN_MS)
 #define TIME_SET_INITIAL_GAP 500
 #define TIME_SET_SPEED_GAP 200
 #define HUNDREDTH_IN_MS 10
+#define WINDOW_OF_OPERATION 200
+#define CLOCK_INIT_OFFSET 1
 
 typedef struct _TimeParameters {
 	int Seconds;
@@ -54,11 +59,11 @@ TimeSetParameters AlarmTimeSet;
 StopperParameters Stopper;
 
 void InitTime();// was void InitTime(TimeParameters Time);
-void InitTimeSet(TimeSetParameters TimeSet);
+void InitTimeSet(TimeSetParameters *TimeSet);
 void InitStopper();
 void UpdateTime(long CurrentTime);
 void DisplayTime(long CurrentTime, bool *FirstTime);
-void HandleTimeSet(long CurrentTime, TimeParameters Time, TimeSetParameters TimeSet, bool IsAlarm);
+void HandleTimeSet(long CurrentTime, TimeParameters *Time, TimeSetParameters *TimeSet, bool IsAlarm);
 void HandleStopper(long CurrentTime);
 void DisplayStopper();
 

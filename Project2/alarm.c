@@ -27,7 +27,7 @@ void HandleAlarm(long CurrentTime) {
 	HandleLeds(CurrentTime);
 	if (CurrentTime - Alarm.StartAlarmTimeStamp == MINUTE_IN_MS) {
 		InitAlarm();
-		// turn off all LEDS
+		LED_SetGroupValue(0);
 		// stop ringtone
 	}
 }
@@ -52,7 +52,7 @@ void HandleLeds(long CurrentTime) {
 	}
 	else {
 		// todo ask metargel, can initialize or do nothing and keep from last point
-		// stop
+		LED_SetGroupValue(0);
 	}
 }
 

@@ -3,7 +3,6 @@
 #include "led.h"
 #include "time.h" 
 #include "alarm.h" 
-//#include "timed.h"
 #include "utils.h"
 #include "rgbled.h"
 #include "btn.h"
@@ -56,6 +55,9 @@ long CurrentTime = 0;
 void __ISR(_TIMER_4_VECTOR, ipl2auto) Timer4SR(void)
 {
 	CurrentTime++;
+	if (!ClockTimeSet.Active) {
+		UpdateTime(CurrentTime);
+	};
 	IFS0bits.T4IF = 0;                  // clear interrupt flag
 }
 
@@ -79,13 +81,11 @@ void main() {
 	init(); //initialize all needed components
 
 			// initialize time
-	InitTime(AlarmTime);
-	InitTime(ClockTime);
-	InitTime(AlarmTime);
+	InitTime();
 
 	// initialize tuning
-	InitTimeSet(ClockTimeSet);
-	InitTimeSet(AlarmTimeSet);
+	InitTimeSet(&ClockTimeSet);
+	InitTimeSet(&AlarmTimeSet);
 
 	// initialize stopper
 	InitStopper();
@@ -99,26 +99,46 @@ void main() {
 	AUDIO_Init(3);
 
 	bool FirstTimeClockIsBackOn = true;
+	//DisplayTime(CurrentTime, &FirstTimeClockIsBackOn);
+
+
+
+	/*char C[100];
+	int i=0;
+	while (1){
+	if ((CurrentTime%2000 == 0) && (CurrentTime>10)){
+	itoa(C,CurrentTime,10);
+	LCD_WriteStringAtPos(C, 0, 0);
+	i++;
+	if (i == 100){
+	break;
+	}
+	}
+
+	}*/
+
+
+	//return;
+	ClockTime.Minutes = 59; //to do remove
+	ClockTime.Seconds = 58; //to do remove
+	CurrentTime = 59 * MINUTE_IN_MS + 58 * SECOND_IN_MS; //to do remove
 
 	while (1)
 	{
-		UpdateTime(CurrentTime);
-		if (SWT_GetValue(0) == 0 && SWT_GetValue(1) == 0) {
+		if ((SWT_GetValue(0) == 0 && SWT_GetValue(1) == 0) || (SWT_GetValue(0) == 1 && SWT_GetValue(1) == 1)) {
 			DisplayTime(CurrentTime, &FirstTimeClockIsBackOn);
 			HandleStopper(CurrentTime);
-			//check stopper   
 		}
 		else {
-			FirstTimeClockIsBackOn == true;
+			SSD_Close();
 		}
-		// clock view - need to be updated all time (ALARM tuning, 
 
 		// check if need to start alarm
 		if (!Alarm.InMiddleOfAlarm) {
 			Alarm.NeedToStartAlarm = CheckIfNeedToStartAlarm();
 			if (Alarm.NeedToStartAlarm) {
 				Alarm.StartAlarmTimeStamp = CurrentTime;
-				Alarm.InMiddleOfAlarm == true;
+				Alarm.InMiddleOfAlarm = true;
 			}
 		}
 		if (Alarm.InMiddleOfAlarm) {
@@ -128,13 +148,13 @@ void main() {
 
 		//Clock tuning
 		while (SWT_GetValue(0) == 1 && SWT_GetValue(1) == 0) {
-
+			FirstTimeClockIsBackOn = true;
 			if (!ClockTimeSet.Active) {
 				ClockTimeSet.TimeSetTimeStamp = CurrentTime;
 				ClockTimeSet.CurrentState = On;
 				ClockTimeSet.Active = true;
 			}
-			HandleTimeSet(CurrentTime, ClockTime, ClockTimeSet, false);
+			HandleTimeSet(CurrentTime, &ClockTime, &ClockTimeSet, false);
 		}
 		ClockTimeSet.Active = false;
 		ClockTimeSet.CurrentState = None;
@@ -142,22 +162,21 @@ void main() {
 
 		// Alarm tuning
 		if (SWT_GetValue(0) == 0 && SWT_GetValue(1) == 1) {
+			FirstTimeClockIsBackOn = true;
 			if (!AlarmTimeSet.Active) {
 				AlarmTimeSet.TimeSetTimeStamp = CurrentTime;
 				AlarmTimeSet.CurrentState = On;
 				AlarmTimeSet.Active = true;
 			}
-			HandleTimeSet(CurrentTime, AlarmTime, AlarmTimeSet, true);
+			HandleTimeSet(CurrentTime, &AlarmTime, &AlarmTimeSet, true);
 		}
 		else {
 			AlarmTimeSet.Active = false;
 			AlarmTimeSet.CurrentState = None;
 			AlarmTimeSet.DisplayFirstTimeOnNone = true;
 		}
-
 	}
 }
-
 
 
 
